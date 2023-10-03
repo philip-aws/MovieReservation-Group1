@@ -13,7 +13,6 @@ public class MovieSchedule {
 	private boolean premierFlag;
 	private String movieTitle;
 	private String movieLength;
-	private int availableSeats;
 	private boolean[][] seatAvailability;
 	private float price;
 
@@ -25,7 +24,6 @@ public class MovieSchedule {
 		this.premierFlag = premierFlag;
 		this.movieTitle = movieTitle;
 		this.movieLength = movieLength;
-		this.availableSeats = 40;
 		this.seatAvailability = new boolean[8][5];
 		for (int i = 0; i < 8; i++) {
 			for (int j = 0; j < 5; j++) {
