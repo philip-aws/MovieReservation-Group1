@@ -38,7 +38,7 @@ public class MRSApp {
 	private LocalDate getInputDate() {
 		System.out.println("\nMovie Schedule\n");
 		while (true) {
-			System.out.println("Input the date (yyyy-mm-dd) to reserve or Input c to cancel.");
+			System.out.println("Input the date (yyyy-mm-dd) to reserve or Input c to cancel :");
 			String dateInput = scanner.nextLine().trim();
 			if (dateInput.equalsIgnoreCase("c")) {
 				return null; // User canceled date input
@@ -47,7 +47,7 @@ public class MRSApp {
 			try {
 				return LocalDate.parse(dateInput, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			} catch (DateTimeParseException e) {
-				System.err.println("Invalid date format. Please use 'yyyy-MM-dd'.");
+				System.err.println("Invalid date format. Please use 'yyyy-mm-dd'.");
 			}
 		}
 	}
@@ -58,11 +58,10 @@ public class MRSApp {
 		for (MovieSchedule schedule : movieSchedules.values()) {
 			if (date.equals(schedule.getShowingDateTime())) {
 				if(foundMovies == false) {
-					System.out.printf("%n%15s %n","Movie Showings on "+date);		
-					System.out.printf("%-9s %-12s %-13s %-8s %n","Cinema#","Time Start","Show Type","Title");
+					System.out.printf("%n%15s %n","Movie Showings on " + date + "\n");		
+					System.out.printf("%-9s %-12s %-13s %-8s %n", "Cinema#", "Time Start", "Show Type", "Title");
 				}
 				System.out.printf("   %-2d   |   %-5s   |   %-6s   |   %-8s   %n", schedule.getCinemaNo(), schedule.getTimeStart(), schedule.isPremierFlag() ? "Premier" : "Regular", schedule.getMovieTitle());
-				System.out.println();
 				foundMovies = true; // Movies were found for the given date
 			}
 		}
@@ -71,7 +70,7 @@ public class MRSApp {
 
 	private void processReservation() {
 		while (true) {
-			System.out.println("Input (CinemaNumber,TimeStart) to reserve or Input c to cancel.");
+			System.out.println("Input (CinemaNumber,TimeStart) to reserve or Input c to cancel :");
 			try {
 				String input = scanner.nextLine().trim();
 				if (input.equalsIgnoreCase("c")) {
@@ -109,14 +108,14 @@ public class MRSApp {
 					System.err.println("Invalid cinema number format. Please enter a valid cinema number.");
 				}
 			} catch (DateTimeParseException err) {
-				System.err.println("Invalid time format");
+				System.err.println("Invalid time format.");
 			}
 		}
 	}
 
 	private boolean proceedToSeatLayout(MovieSchedule schedule) {
 		while(true) {
-			System.out.println("Proceed to Seat layout? Type 'Y' to proceed or 'N' to cancel and pick another date");
+			System.out.println("Proceed to Seat layout? Type 'Y' to proceed or 'N' to cancel :");
 			String willProceedSeat = scanner.nextLine();
 
 			if (willProceedSeat.equalsIgnoreCase("Y")) {
@@ -134,7 +133,7 @@ public class MRSApp {
 					}
 					for (int j = 1; j <=5; j++) {
 						if(schedule.isSeatAvailable(letter[i] + Integer.toString(j))) {
-							System.out.printf("  %-4s","["+letter[i]+Integer.toString(j)+"]");
+							System.out.printf("  %-4s","[" + letter[i]+Integer.toString(j) + "]");
 						} else {
 							System.out.printf("  %-4s","[**]");
 						}
@@ -146,7 +145,7 @@ public class MRSApp {
 				while (true) {
 					if (schedule.getAvailableSeats() > 0) {
 						try {
-							System.out.println("\nInput seats (Seat1,Seat2,...) to be reserved or Input c to cancel:");
+							System.out.println("\nInput seats (Seat1,Seat2,...) to be reserved or Input c to cancel :");
 							ArrayList<String> seatInput = new ArrayList<>(); // seats reserved will be put here
 							String seatNumbers = scanner.nextLine().trim();
 
@@ -172,7 +171,7 @@ public class MRSApp {
 								int numberOfSenior = 0;
 								if(!schedule.isPremierFlag()) {
 									while(true) {
-										System.out.println("Input the number of senior citizens or type c to cancel:");
+										System.out.println("Input the number of senior citizens or type c to cancel :");
 										String seniorInput = scanner.nextLine().trim();
 
 										if (seniorInput.equalsIgnoreCase("c")) {
@@ -182,7 +181,7 @@ public class MRSApp {
 										try {
 											numberOfSenior = Integer.parseInt(seniorInput);
 											if(numberOfSenior > seatInput.size()) {
-												System.err.println("Input exceeds number of seats");
+												System.err.println("Input exceeds number of seats.");
 												continue;
 											}
 											break; // Exit the loop when a valid integer is entered
@@ -191,6 +190,7 @@ public class MRSApp {
 										}
 									}
 								}
+								
 								while(true) {
 									System.out.println("Total price for Ticket is Php " + schedule.calculatePrice(seatArray.length, numberOfSenior) + " Confirm? (Y/N)");
 									String confirmReservation = scanner.nextLine();
@@ -216,7 +216,7 @@ public class MRSApp {
 							System.err.println("Please input the correct seat number format.");
 						}
 					} else {
-						System.err.println("Seats are all reserved");
+						System.err.println("Seats are all reserved.");
 						return true;
 					}
 				}
@@ -247,14 +247,14 @@ public class MRSApp {
 						MovieSchedule schedule = new MovieSchedule(date, cinemaNo, timeStart, isPremierFlag, movieTitle, movieLength);
 						movieSchedules.put(key++, schedule);
 					} catch (DateTimeParseException | NumberFormatException e) {
-						System.out.println("Error parsing movie schedule data from CSV: " + e.getMessage());
+						System.out.println("Error parsing movie schedule data from CSV : " + e.getMessage());
 					}
 				} else {
-					System.err.println("Invalid CSV line: " + line);
+					System.err.println("Invalid CSV line : " + line);
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Error reading CSV file: " + e.getMessage());
+			System.err.println("Error reading CSV file : " + e.getMessage());
 		}
 	}
 
@@ -283,10 +283,10 @@ public class MRSApp {
 						}
 
 					} catch (DateTimeParseException | NumberFormatException e) {
-						System.err.println("Error parsing movie reservation data from CSV: " + e.getMessage());
+						System.err.println("Error parsing movie reservation data from CSV : " + e.getMessage());
 					}
 				} else {
-					System.err.println("Invalid CSV line: " + line);
+					System.err.println("Invalid CSV line : " + line);
 				}
 
 				RESERVATION_NUMBER = maxReservationNumber + 1;
@@ -305,7 +305,7 @@ public class MRSApp {
 				}
 			}
 		} catch (IOException e) {
-			System.err.println("Error reading CSV file: " + e.getMessage());
+			System.err.println("Error reading CSV file : " + e.getMessage());
 		}
 	}
 
@@ -348,7 +348,7 @@ public class MRSApp {
 				for (MovieReservation reservation : movieReservation.values()) {
 					if (reservationNumber == reservation.getReservationNo()) {
 						while(true) {
-							System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ?");
+							System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
 							String cancelReservation = scanner.nextLine();
 							if(cancelReservation.equalsIgnoreCase("Y")) {
 								for(MovieSchedule schedule : movieSchedules.values()) {
@@ -362,14 +362,14 @@ public class MRSApp {
 								long reservationNo = reservation.getReservationNo();
 								movieReservation.remove(reservation.getReservationNo());
 								deleteMovieReservation(reservation.getReservationNo());
-								System.err.println("Ticket \"" + reservationNo + "\" Has Been Canceled\n");
+								System.err.println("Ticket \"" + reservationNo + "\" Has Been Canceled.\n");
 								reservationNumberExist = true;
 								break;
 							} else if (cancelReservation.equalsIgnoreCase("N")) {
 								reservationNumberExist = true;
 								break;
 							} else {
-								System.err.println("Please input 'Y' or 'N'");
+								System.err.println("Please input 'Y' or 'N'.");
 							}
 						}
 						break;
@@ -379,11 +379,11 @@ public class MRSApp {
 				if(reservationNumberExist) {
 					break;
 				} else {
-					System.err.println("Reservation Number does not exist");
+					System.err.println("Reservation Number does not exist.");
 				}
 
 			} catch (NumberFormatException err) {
-				System.err.println("Reservation Number does not exist");
+				System.err.println("Reservation Number does not exist.");
 			}
 		}
 	}
@@ -465,7 +465,7 @@ public class MRSApp {
 				cancelMovieReservation();
 				break;
 			default:
-				System.err.println("Invalid input. Please try again");
+				System.err.println("Invalid input. Please try again.");
 				break;
 			}
 		}
