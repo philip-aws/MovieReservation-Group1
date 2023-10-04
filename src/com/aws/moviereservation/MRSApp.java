@@ -40,7 +40,7 @@ public class MRSApp {
 		while (true) {
 			System.out.println("Input the date (yyyy-mm-dd) to reserve or Input c to cancel :");
 			String dateInput = scanner.nextLine().trim();
-			if (dateInput.equalsIgnoreCase("c")) {
+			if (dateInput.equalsIgnoreCase("C")) {
 				return null; // User canceled date input
 			}
 
@@ -73,7 +73,7 @@ public class MRSApp {
 			System.out.println("Input (CinemaNumber,TimeStart) to reserve or Input c to cancel :");
 			try {
 				String input = scanner.nextLine().trim();
-				if (input.equalsIgnoreCase("c")) {
+				if (input.equalsIgnoreCase("C")) {
 					break; // Cancel and go back to the input date
 				}
 
@@ -114,116 +114,105 @@ public class MRSApp {
 	}
 
 	private boolean proceedToSeatLayout(MovieSchedule schedule) {
-		while(true) {
-			System.out.println("Proceed to Seat layout? Type 'Y' to proceed or 'N' to cancel :");
-			String willProceedSeat = scanner.nextLine();
+		System.out.println("\nSeat Layout for " + schedule.getMovieTitle() + " @ " + schedule.getTimeStart());
+		System.out.printf("      %-10s %n %n","**********Screen**********");
 
-			if (willProceedSeat.equalsIgnoreCase("Y")) {
-				System.out.println("\nSeat Layout for " + schedule.getMovieTitle() + " @ " + schedule.getTimeStart());
-				System.out.printf("      %-10s %n %n","**********Screen**********");
+		String[] letter = {"A","B","C","D","E","F","G","H"};
 
-				String[] letter = {"A","B","C","D","E","F","G","H"};
+		for (int i = 0; i < 8; i++) {
 
-				for (int i = 0; i < 8; i++) {
-
-					if(i == 7) {
-						System.out.printf("%-8s ","Exit |");
-					} else {
-						System.out.printf("    %-4s "," |");
-					}
-					for (int j = 1; j <=5; j++) {
-						if(schedule.isSeatAvailable(letter[i] + Integer.toString(j))) {
-							System.out.printf("  %-4s","[" + letter[i]+Integer.toString(j) + "]");
-						} else {
-							System.out.printf("  %-4s","[**]");
-						}
-					}
-					System.out.printf("%n");
-				}
-				System.out.println("\nLegend: [Xn] = available seat, [**] = reserved seat\n");
-
-				while (true) {
-					if (schedule.getAvailableSeats() > 0) {
-						try {
-							System.out.println("\nInput seats (Seat1,Seat2,...) to be reserved or Input c to cancel :");
-							ArrayList<String> seatInput = new ArrayList<>(); // seats reserved will be put here
-							String seatNumbers = scanner.nextLine().trim();
-
-							if (seatNumbers.equalsIgnoreCase("c")) {
-								return true; // Cancel and go back to menu
-							}
-
-							String[] seatArray = seatNumbers.split(",");
-							for (String seat : seatArray) {
-								seatInput.add(seat.trim().toUpperCase());
-							}
-
-							boolean seatsAvailable = true;
-							for (String seat : seatInput) {
-								if (!schedule.isSeatAvailable(seat)) {
-									System.err.println("Seat " + seat + " is not available.");
-									seatsAvailable = false;
-									break;
-								}
-							}
-
-							if (seatsAvailable) {                     
-								int numberOfSenior = 0;
-								if(!schedule.isPremierFlag()) {
-									while(true) {
-										System.out.println("Input the number of senior citizens or type c to cancel :");
-										String seniorInput = scanner.nextLine().trim();
-
-										if (seniorInput.equalsIgnoreCase("c")) {
-											return true;
-										}
-
-										try {
-											numberOfSenior = Integer.parseInt(seniorInput);
-											if(numberOfSenior > seatInput.size()) {
-												System.err.println("Input exceeds number of seats.");
-												continue;
-											}
-											break; // Exit the loop when a valid integer is entered
-										} catch (NumberFormatException e) {
-											System.err.println("Invalid input. Please enter a valid number.");
-										}
-									}
-								}
-								
-								while(true) {
-									System.out.println("Total price for Ticket is Php " + schedule.calculatePrice(seatArray.length, numberOfSenior) + " Confirm? (Y/N)");
-									String confirmReservation = scanner.nextLine();
-									if (confirmReservation.equalsIgnoreCase("Y")) {
-										// Reserve the selected seats
-										schedule.reserveSeats(seatInput);
-										// Create a MovieReservation Ticket
-										MovieReservation reservation = new MovieReservation(RESERVATION_NUMBER, schedule.getShowingDateTime(), schedule.getCinemaNo(), schedule.getTimeStart(), seatInput, schedule.calculatePrice(seatArray.length, numberOfSenior));
-										movieReservation.put(RESERVATION_NUMBER++, reservation);
-
-										// CREATE CSV FILE FOR TICKET HERE
-										createMovieTicketCSV(reservation);
-										return true;
-
-									} else if (confirmReservation.equalsIgnoreCase("N")) {
-										return true;
-									} else {
-										System.err.println("Please input 'Y' or 'N'");
-									}
-								}
-							}
-						} catch (NumberFormatException err) {
-							System.err.println("Please input the correct seat number format.");
-						}
-					} else {
-						System.err.println("Seats are all reserved.");
-						return true;
-					}
-				}
-			} else if (willProceedSeat.equalsIgnoreCase("N")) {
-				return true; // Go back to the cinema number and movie title input
+			if(i == 7) {
+				System.out.printf("%-8s ","Exit |");
 			} else {
-				System.err.println("Invalid input. Please type 'Y' or 'N'.");
+				System.out.printf("    %-4s "," |");
+			}
+			for (int j = 1; j <=5; j++) {
+				if(schedule.isSeatAvailable(letter[i] + Integer.toString(j))) {
+					System.out.printf("  %-4s","[" + letter[i]+Integer.toString(j) + "]");
+				} else {
+					System.out.printf("  %-4s","[**]");
+				}
+			}
+			System.out.printf("%n");
+		}
+		System.out.println("\nLegend: [Xn] = available seat, [**] = reserved seat\n");
+
+		while (true) {
+			if (schedule.getAvailableSeats() > 0) {
+				try {
+					System.out.println("Input seats (Seat1,Seat2,...) to be reserved or Input c to cancel :");
+					ArrayList<String> seatInput = new ArrayList<>(); // seats reserved will be put here
+					String seatNumbers = scanner.nextLine().trim();
+
+					if (seatNumbers.equalsIgnoreCase("C")) {
+						return true; // Cancel and go back to menu
+					}
+
+					String[] seatArray = seatNumbers.split(",");
+					for (String seat : seatArray) {
+						seatInput.add(seat.trim().toUpperCase());
+					}
+
+					boolean seatsAvailable = true;
+					for (String seat : seatInput) {
+						if (!schedule.isSeatAvailable(seat)) {
+							System.err.println("Seat " + seat + " is not available.");
+							seatsAvailable = false;
+							break;
+						}
+					}
+
+					if (seatsAvailable) {                     
+						int numberOfSenior = 0;
+						if(!schedule.isPremierFlag()) {
+							while(true) {
+								System.out.println("Input the number of senior citizens or type c to cancel :");
+								String seniorInput = scanner.nextLine().trim();
+
+								if (seniorInput.equalsIgnoreCase("C")) {
+									return true;
+								}
+
+								try {
+									numberOfSenior = Integer.parseInt(seniorInput);
+									if(numberOfSenior > seatInput.size()) {
+										System.err.println("Input exceeds number of seats.");
+										continue;
+									}
+									break; // Exit the loop when a valid integer is entered
+								} catch (NumberFormatException e) {
+									System.err.println("Invalid input. Please enter a valid number.");
+								}
+							}
+						}
+
+						while(true) {
+							System.out.println("Total price for Ticket is Php " + schedule.calculatePrice(seatArray.length, numberOfSenior) + " Confirm? (Y/N) :");
+							String confirmReservation = scanner.nextLine();
+							if (confirmReservation.equalsIgnoreCase("Y")) {
+								// Reserve the selected seats
+								schedule.reserveSeats(seatInput);
+								// Create a MovieReservation Ticket
+								MovieReservation reservation = new MovieReservation(RESERVATION_NUMBER, schedule.getShowingDateTime(), schedule.getCinemaNo(), schedule.getTimeStart(), seatInput, schedule.calculatePrice(seatArray.length, numberOfSenior));
+								movieReservation.put(RESERVATION_NUMBER++, reservation);
+
+								// CREATE CSV FILE FOR TICKET HERE
+								createMovieTicketCSV(reservation);
+								return true;
+
+							} else if (confirmReservation.equalsIgnoreCase("N")) {
+								break;
+							} else {
+								System.err.println("Please input 'Y' or 'N'");
+							}
+						}
+					}
+				} catch (NumberFormatException err) {
+					System.err.println("Please input the correct seat number format.");
+				}
+			} else {
+				System.err.println("Seats are all reserved.");
+				return false;
 			}
 		}
 	}
