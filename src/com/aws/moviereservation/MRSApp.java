@@ -1,6 +1,7 @@
 package com.aws.moviereservation;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
@@ -59,4 +60,51 @@ public class MRSApp {
 		}
 		return foundMovies; // Return true if movies were found, false otherwise
 	}
+
+	private void processReservation() {
+			while (true) {
+				System.out.println("Input (CinemaNumber,TimeStart) to reserve or Input c to cancel.");
+				try {
+					String input = scanner.nextLine().trim();
+					if (input.equalsIgnoreCase("c")) {
+						break; // Cancel and go back to the input date
+					}
+
+					String[] parts = input.split(",");
+					if (parts.length != 2) {
+						System.err.println("Invalid input format. Please use 'CinemaNumber,Time' format.");
+						continue; // Retry the input
+					}
+
+					try {
+						byte cinemaNumber = Byte.parseByte(parts[0].trim());
+						String timeStart = parts[1].trim();
+						LocalTime timeStartFormatted = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("HH:mm"));
+
+
+						MovieSchedule selectedSchedule = null;
+						for (MovieSchedule schedule : movieSchedules.values()) {
+							if (cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
+								selectedSchedule = schedule;
+								break;
+							}
+						}
+
+						if (selectedSchedule == null) {
+							System.err.println("No existing movie.");
+						} else {
+							if (proceedToSeatLayout(selectedSchedule)) {
+								break; // Exit the input loop
+							}
+						}
+					} catch (NumberFormatException e) {
+						System.err.println("Invalid cinema number format. Please enter a valid cinema number.");
+					}
+				} catch (DateTimeParseException err) {
+					System.err.println("Invalid time format");
+				}
+			}
+		}
+
 }
+
