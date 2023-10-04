@@ -11,7 +11,7 @@ public class MovieReservation {
 	private LocalTime timeStart;
 	private ArrayList<String> reservedSeats;
 	private float totalPrice;
-	
+
 	public MovieReservation(long reservationNo, LocalDate showingDateTime, byte cinemaNo, LocalTime timeStart,
 			ArrayList<String> reservedSeats, float totalPrice) {
 		this.reservationNo = reservationNo;
@@ -45,5 +45,5 @@ public class MovieReservation {
 	public float getTotalPrice() {
 		return totalPrice;
 	}
-	
+
 }
