@@ -59,16 +59,16 @@ public class MRSApp {
 			if (date.equals(schedule.getShowingDateTime())) {
 				if(foundMovies == false) {
 					System.out.printf("%n%15s %n", "Movie Showings on " + date + "\n");		
-					System.out.printf("%-9s %-12s %-13s %-8s %n", "Cinema#", "Time Start", "Show Type", "Title");
+					System.out.printf("%-9s %-12s %-17s %-8s %n", "Cinema#", "Time Start", "Show Type", "Title");
 				}
-				System.out.printf("   %-2d   |   %-5s   |   %-6s   |   %-8s   %n", schedule.getCinemaNo(), schedule.getTimeStart(), schedule.isPremierFlag() ? "Premier" : "Regular", schedule.getMovieTitle());
+				System.out.printf("   %-5d|   %-8s|   %-9s|   %-11s%n", schedule.getCinemaNo(), schedule.getTimeStart(), schedule.isPremierFlag() ? "Premier" : "Regular", schedule.getMovieTitle());
 				foundMovies = true; // Movies were found for the given date
 			}
 		}
 		return foundMovies; // Return true if movies were found, false otherwise
 	}
 
-	private void processReservation() {
+	private void processReservation(LocalDate date) {
 		while (true) {
 			System.out.println("Input (CinemaNumber,TimeStart) to reserve or Input c to cancel :");
 			try {
@@ -91,7 +91,7 @@ public class MRSApp {
 
 					MovieSchedule selectedSchedule = null;
 					for (MovieSchedule schedule : movieSchedules.values()) {
-						if (cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
+						if (date.equals(schedule.getShowingDateTime()) && cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
 							selectedSchedule = schedule;
 							break;
 						}
@@ -114,8 +114,8 @@ public class MRSApp {
 	}
 
 	private boolean proceedToSeatLayout(MovieSchedule schedule) {
-		System.out.println("\nSeat Layout for " + schedule.getMovieTitle() + " @ " + schedule.getTimeStart());
-		System.out.printf("      %-10s %n %n","**********Screen**********");
+		System.out.println("\nSeat Layout for " + schedule.getMovieTitle() + " @ " + schedule.getTimeStart() + "\n");
+		System.out.printf("%38s %n %n","********* Screen *********");
 
 		String[] letter = {"A","B","C","D","E","F","G","H"};
 
@@ -443,7 +443,7 @@ public class MRSApp {
 					}
 
 					if (getMovieSchedules(date)) {
-						processReservation();
+						processReservation(date);
 						break; // Back to menu
 					} else {
 						System.err.println("No movies scheduled for this date. Please try another date.");
