@@ -58,7 +58,7 @@ public class MRSApp {
 		for (MovieSchedule schedule : movieSchedules.values()) {
 			if (date.equals(schedule.getShowingDateTime())) {
 				if(foundMovies == false) {
-					System.out.printf("%n%15s %n","Movie Showings on " + date + "\n");		
+					System.out.printf("%n%15s %n", "Movie Showings on " + date + "\n");		
 					System.out.printf("%-9s %-12s %-13s %-8s %n", "Cinema#", "Time Start", "Show Type", "Title");
 				}
 				System.out.printf("   %-2d   |   %-5s   |   %-6s   |   %-8s   %n", schedule.getCinemaNo(), schedule.getTimeStart(), schedule.isPremierFlag() ? "Premier" : "Regular", schedule.getMovieTitle());
@@ -158,7 +158,6 @@ public class MRSApp {
 						if (!schedule.isSeatAvailable(seat)) {
 							System.err.println("Seat " + seat + " is not available.");
 							seatsAvailable = false;
-							break;
 						}
 					}
 
@@ -209,6 +208,8 @@ public class MRSApp {
 					}
 				} catch (NumberFormatException err) {
 					System.err.println("Please input the correct seat number format.");
+				} catch (IllegalArgumentException err) {
+					System.err.println(err.getMessage());
 				}
 			} else {
 				System.err.println("Seats are all reserved.");

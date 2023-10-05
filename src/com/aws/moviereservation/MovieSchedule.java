@@ -78,7 +78,9 @@ public class MovieSchedule {
 		int row = rowChar - 'A'; // Convert 'A' to 0, 'B' to 1, and so on
 
 		// Check if the seat is within valid range and available
-		if (row >= 0 && row < 8 && col >= 0 && col < 5 && seatAvailability[row][col]) {
+		if(row < 0 || row >= 8 || col < 0 || col >= 5) {
+			throw new IllegalArgumentException("Please pick seats from the seat layout above.");
+		} else if (row >= 0 && row < 8 && col >= 0 && col < 5 && seatAvailability[row][col]) {
 			return true;
 		} else {
 			return false;
