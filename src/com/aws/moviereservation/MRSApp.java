@@ -88,7 +88,6 @@ public class MRSApp {
 					String timeStart = parts[1].trim();
 					LocalTime timeStartFormatted = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("HH:mm"));
 
-
 					MovieSchedule selectedSchedule = null;
 					for (MovieSchedule schedule : movieSchedules.values()) {
 						if (date.equals(schedule.getShowingDateTime()) && cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
@@ -128,7 +127,7 @@ public class MRSApp {
 			}
 			for (int j = 1; j <=5; j++) {
 				if(schedule.isSeatAvailable(letter[i] + Integer.toString(j))) {
-					System.out.printf("  %-4s","[" + letter[i]+Integer.toString(j) + "]");
+					System.out.printf("  %-4s","[" + letter[i] + Integer.toString(j) + "]");
 				} else {
 					System.out.printf("  %-4s","[**]");
 				}
@@ -218,6 +217,124 @@ public class MRSApp {
 		}
 	}
 
+	private void createMovieTicketCSV(MovieReservation reservation) {
+		try {
+			// Create a FileWriter object for the CSV file
+			FileWriter writer = new FileWriter(movieTicketFilePath, true);
+
+			writer.write("\"" + String.valueOf(reservation.getReservationNo() + "\"," +
+					"\"" + reservation.getShowingDateTime().toString()) + "\"," +
+					"\"" + String.valueOf(reservation.getCinemaNo()) + "\"," +
+					"\"" + reservation.getTimeStart().toString() + "\"," +
+					"\"" + String.join(",", reservation.getReservedSeats()) + "\"," +
+					"\"" + String.valueOf(reservation.getTotalPrice()) + "\"\n"
+					);
+			// Close the FileWriter
+			writer.close();
+			System.out.println("Your ticket number is \"" + reservation.getReservationNo() + "\"");
+
+		} catch (IOException e) {
+			System.err.println("Error writing to CSV file: " + e.getMessage());
+		}
+	}
+
+	private void cancelMovieReservation() {
+		boolean reservationNumberExist = false;
+		System.out.println("\nCancel Reservation\n");
+		while(true) {
+			System.out.println("Input Reservation Number or Input c to cancel :");
+			try {
+
+				String reservationNumberInput = scanner.nextLine();
+
+				if(reservationNumberInput.equalsIgnoreCase("C")) {
+					break;
+				}
+
+				long reservationNumber = Long.valueOf(reservationNumberInput);
+				for (MovieReservation reservation : movieReservation.values()) {
+					if (reservationNumber == reservation.getReservationNo()) {
+						while(true) {
+							System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
+							String cancelReservation = scanner.nextLine();
+							if(cancelReservation.equalsIgnoreCase("Y")) {
+								for(MovieSchedule schedule : movieSchedules.values()) {
+									if (reservation.getCinemaNo() == schedule.getCinemaNo()
+											&& reservation.getShowingDateTime().equals(schedule.getShowingDateTime())
+											&& reservation.getTimeStart().equals(schedule.getTimeStart())) {
+										schedule.cancelReservedSeats(reservation.getReservedSeats());
+										break;
+									}
+								}
+								long reservationNo = reservation.getReservationNo();
+								deleteMovieReservation(reservation.getReservationNo()); // delete reservation from the csv
+								movieReservation.remove(reservation.getReservationNo()); // remove reservation from the hashmap
+								System.err.println("Ticket \"" + reservationNo + "\" Has Been Canceled.\n");
+								reservationNumberExist = true;
+								break;
+							} else if (cancelReservation.equalsIgnoreCase("N")) {
+								reservationNumberExist = true;
+								break;
+							} else {
+								System.err.println("Please input 'Y' or 'N'.");
+							}
+						}
+						break;
+					}
+				}
+				
+				if(reservationNumberExist) {
+					break;
+				} else {
+					System.err.println("Reservation Number does not exist.");
+				}
+
+			} catch (NumberFormatException err) {
+				System.err.println("Reservation Number does not exist.");
+			}
+		}
+	}
+
+	private void deleteMovieReservation(long reservationNumberToDelete) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(movieTicketFilePath));
+			String line = "";
+			String reservationNumber = Long.toString(reservationNumberToDelete);
+			//This is your buffer, where you are writing all your lines to
+			ArrayList<String> fileContents = new ArrayList<String>();
+
+			//loop through each line
+			while ((line = br.readLine()) != null) {
+				//if the line we're on contains the text we don't want to add, skip it
+				if (line.contains(reservationNumber)) {
+					//skip
+					continue;
+				}
+				//if we get here, we assume that we want the text, so add it
+				fileContents.add(line);
+			}
+
+			br.close();
+
+			//create a writer
+			BufferedWriter bw = new BufferedWriter(new FileWriter(movieTicketFilePath));
+
+			//loop through our buffer
+			for (String s : fileContents) {
+				//write the line to our file
+				bw.write(s);
+				bw.newLine();
+			}
+
+			//close the writer
+			bw.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	private void initializeMovieSchedulesFromCSV() {
 		try (BufferedReader br = new BufferedReader(new FileReader(movieScheduleFilePath))) {
 			int key = 1; // Key to identify each movie schedule
@@ -299,126 +416,8 @@ public class MRSApp {
 		}
 	}
 
-
-	private void createMovieTicketCSV(MovieReservation reservation) {
-		try {
-			// Create a FileWriter object for the CSV file
-			FileWriter writer = new FileWriter(movieTicketFilePath, true);
-
-			writer.write("\"" + String.valueOf(reservation.getReservationNo() + "\"," +
-					"\"" + reservation.getShowingDateTime().toString()) + "\"," +
-					"\"" + String.valueOf(reservation.getCinemaNo()) + "\"," +
-					"\"" + reservation.getTimeStart().toString() + "\"," +
-					"\"" + String.join(",", reservation.getReservedSeats()) + "\"," +
-					"\"" + String.valueOf(reservation.getTotalPrice()) + "\"\n"
-					);
-			// Close the FileWriter
-			writer.close();
-			System.out.println("Your ticket number is \"" + reservation.getReservationNo() + "\"");
-
-		} catch (IOException e) {
-			System.err.println("Error writing to CSV file: " + e.getMessage());
-		}
-	}
-
-	private void cancelMovieReservation() {
-		boolean reservationNumberExist = false;
-		System.out.println("\nCancel Reservation\n");
-		while(true) {
-			System.out.println("Input Reservation Number or Input c to cancel :");
-			try {
-
-				String reservationNumberInput = scanner.nextLine();
-
-				if(reservationNumberInput.equalsIgnoreCase("C")) {
-					break;
-				}
-
-				long reservationNumber = Long.valueOf(reservationNumberInput);
-				for (MovieReservation reservation : movieReservation.values()) {
-					if (reservationNumber == reservation.getReservationNo()) {
-						while(true) {
-							System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
-							String cancelReservation = scanner.nextLine();
-							if(cancelReservation.equalsIgnoreCase("Y")) {
-								for(MovieSchedule schedule : movieSchedules.values()) {
-									if (reservation.getCinemaNo() == schedule.getCinemaNo()
-											&& reservation.getShowingDateTime().equals(schedule.getShowingDateTime())
-											&& reservation.getTimeStart().equals(schedule.getTimeStart())) {
-										schedule.cancelReservedSeats(reservation.getReservedSeats());
-										break;
-									}
-								}
-								long reservationNo = reservation.getReservationNo();
-								movieReservation.remove(reservation.getReservationNo());
-								deleteMovieReservation(reservation.getReservationNo());
-								System.err.println("Ticket \"" + reservationNo + "\" Has Been Canceled.\n");
-								reservationNumberExist = true;
-								break;
-							} else if (cancelReservation.equalsIgnoreCase("N")) {
-								reservationNumberExist = true;
-								break;
-							} else {
-								System.err.println("Please input 'Y' or 'N'.");
-							}
-						}
-						break;
-					}
-				}
-
-				if(reservationNumberExist) {
-					break;
-				} else {
-					System.err.println("Reservation Number does not exist.");
-				}
-
-			} catch (NumberFormatException err) {
-				System.err.println("Reservation Number does not exist.");
-			}
-		}
-	}
-
-	private void deleteMovieReservation(long reservationNumberToDelete) {
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(movieTicketFilePath));
-			String line = "";
-			String reservationNumber = Long.toString(reservationNumberToDelete);
-			//This is your buffer, where you are writing all your lines to
-			ArrayList<String> fileContents = new ArrayList<String>();
-
-			//loop through each line
-			while ((line = br.readLine()) != null) {
-				//if the line we're on contains the text we don't want to add, skip it
-				if (line.contains(reservationNumber)) {
-					//skip
-					continue;
-				}
-				//if we get here, we assume that we want the text, so add it
-				fileContents.add(line);
-			}
-
-			br.close();
-
-			//create a writer
-			BufferedWriter bw = new BufferedWriter(new FileWriter(movieTicketFilePath));
-
-			//loop through our buffer
-			for (String s : fileContents) {
-				//write the line to our file
-				bw.write(s);
-				bw.newLine();
-			}
-
-			//close the writer
-			bw.close();
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	public void run() {
+		System.out.println("Welcome to CinemaWorld Cebu Branch \n\n");
 		initializeMovieSchedulesFromCSV(); // add schedules from csv to hashmap
 
 		File f1 = new File(movieTicketFilePath);
@@ -460,6 +459,5 @@ public class MRSApp {
 			}
 		}
 	}
-
 }
 
