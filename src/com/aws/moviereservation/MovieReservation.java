@@ -45,5 +45,4 @@ public class MovieReservation {
 	public float getTotalPrice() {
 		return totalPrice;
 	}
-
 }
