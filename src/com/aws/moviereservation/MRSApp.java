@@ -14,7 +14,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class MRSApp {
@@ -30,8 +29,14 @@ public class MRSApp {
 		System.out.println("[Press 2] - To Cancel Reservation");
 		System.out.println("\nSelect from the options above");
 		try {
-			return scanner.nextInt();
-		} catch (InputMismatchException err) {
+			String userInput = scanner.nextLine();
+			if (userInput.isEmpty()) {
+				throw new NumberFormatException();
+			} else {
+				int intUserInput = Integer.parseInt(userInput);
+				return intUserInput;
+			}
+		} catch (NumberFormatException err) {
 			return 0;
 		}
 	}
@@ -89,9 +94,11 @@ public class MRSApp {
 					String timeStart = parts[1].trim();
 					LocalTime timeStartFormatted = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("HH:mm"));
 					MovieSchedule selectedSchedule = null;
+
 					if(cinemaNumber < 1 || cinemaNumber > 4) {
 						throw new NumberFormatException();
 					}
+
 					for (MovieSchedule schedule : movieSchedules.values()) {
 						if (date.equals(schedule.getShowingDateTime()) && cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
 							selectedSchedule = schedule;
@@ -428,7 +435,6 @@ public class MRSApp {
 
 		while(true) {
 			int menu = displayMenuAndGetChoice();
-			scanner.nextLine();
 
 			switch (menu) {
 			case 1:
