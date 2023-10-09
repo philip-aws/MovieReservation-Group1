@@ -239,12 +239,10 @@ public class MRSApp {
 	}
 
 	private void cancelMovieReservation() {
-		boolean reservationNumberExist = false;
 		System.out.println("\nCancel Reservation\n");
 		while(true) {
 			System.out.println("Input Reservation Number or Input c to cancel :");
 			try {
-
 				String reservationNumberInput = scanner.nextLine();
 
 				if(reservationNumberInput.equalsIgnoreCase("C")) {
@@ -252,45 +250,37 @@ public class MRSApp {
 				}
 
 				long reservationNumber = Long.valueOf(reservationNumberInput);
-				for (MovieReservation reservation : movieReservation.values()) {
-					if (reservationNumber == reservation.getReservationNo()) {
-						while(true) {
-							System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
-							String cancelReservation = scanner.nextLine();
-							if(cancelReservation.equalsIgnoreCase("Y")) {
-								for(MovieSchedule schedule : movieSchedules.values()) {
-									if (reservation.getCinemaNo() == schedule.getCinemaNo()
-											&& reservation.getShowingDateTime().equals(schedule.getShowingDateTime())
-											&& reservation.getTimeStart().equals(schedule.getTimeStart())) {
-										schedule.cancelReservedSeats(reservation.getReservedSeats());
-										break;
-									}
+
+				MovieReservation reservation = movieReservation.get(reservationNumber);
+
+				if (reservation != null && reservationNumber == reservation.getReservationNo()) {
+					while(true) {
+						System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
+						String cancelReservation = scanner.nextLine();
+						if(cancelReservation.equalsIgnoreCase("Y")) {
+							for(MovieSchedule schedule : movieSchedules.values()) {
+								if (reservation.getCinemaNo() == schedule.getCinemaNo()
+										&& reservation.getShowingDateTime().equals(schedule.getShowingDateTime())
+										&& reservation.getTimeStart().equals(schedule.getTimeStart())) {
+									schedule.cancelReservedSeats(reservation.getReservedSeats());
+									break;
 								}
-								long reservationNo = reservation.getReservationNo();
-								deleteMovieReservation(reservation.getReservationNo()); // delete reservation from the csv
-								movieReservation.remove(reservation.getReservationNo()); // remove reservation from the hashmap
-								System.err.println("Ticket \"" + reservationNo + "\" Has Been Canceled.\n");
-								reservationNumberExist = true;
-								break;
-							} else if (cancelReservation.equalsIgnoreCase("N")) {
-								reservationNumberExist = true;
-								break;
-							} else {
-								System.err.println("Please input 'Y' or 'N'.");
 							}
+							deleteMovieReservation(reservation.getReservationNo()); // delete reservation from the csv
+							movieReservation.remove(reservation.getReservationNo()); // remove reservation from the hashmap
+							System.err.println("Ticket \"" + reservationNumber + "\" Has Been Canceled.\n");
+							return;
+						} else if (cancelReservation.equalsIgnoreCase("N")) {
+							break;
+						} else {
+							System.err.println("Please input 'Y' or 'N'.");
 						}
-						break;
 					}
-				}
-				
-				if(reservationNumberExist) {
-					break;
 				} else {
 					System.err.println("Reservation Number does not exist.");
 				}
-
 			} catch (NumberFormatException err) {
-				System.err.println("Reservation Number does not exist.");
+				System.err.println("Invalid input. Please input a valid Reservation Number.");
 			}
 		}
 	}
@@ -395,11 +385,10 @@ public class MRSApp {
 				} else {
 					System.err.println("Invalid CSV line : " + line);
 				}
-
+				// Initializing reservation Number +1 from the last reservation Number
 				RESERVATION_NUMBER = maxReservationNumber + 1;
 			}
 
-			// Initializing reservation Number +1 from the last reservation Number
 			// Reserved seats when running the system
 			for(MovieReservation movieReservation : movieReservation.values()) {
 				for(MovieSchedule schedule : movieSchedules.values()) {
