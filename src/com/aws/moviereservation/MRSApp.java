@@ -224,6 +224,8 @@ public class MRSApp {
 					System.err.println("Please input the correct seat number format.");
 				} catch (IllegalArgumentException err) {
 					System.err.println(err.getMessage());
+				} catch (StringIndexOutOfBoundsException err) {
+					System.err.println("Please input seat number.");
 				}
 			} else {
 				System.err.println("Seats are all reserved.");
