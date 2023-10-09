@@ -49,7 +49,6 @@ public class MRSApp {
 			if (dateInput.equalsIgnoreCase("C")) {
 				return null; // User canceled date input
 			}
-
 			try {
 				return LocalDate.parse(dateInput, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 			} catch (DateTimeParseException e) {
