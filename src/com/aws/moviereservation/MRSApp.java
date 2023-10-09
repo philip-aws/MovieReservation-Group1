@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,7 +88,6 @@ public class MRSApp {
 					byte cinemaNumber = Byte.parseByte(parts[0].trim());
 					String timeStart = parts[1].trim();
 					LocalTime timeStartFormatted = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("HH:mm"));
-
 					MovieSchedule selectedSchedule = null;
 					for (MovieSchedule schedule : movieSchedules.values()) {
 						if (date.equals(schedule.getShowingDateTime()) && cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
@@ -99,6 +99,11 @@ public class MRSApp {
 					if (selectedSchedule == null) {
 						System.err.println("No existing movie.");
 					} else {
+						long minutesUntilShow = ChronoUnit.MINUTES.between(LocalTime.now(), selectedSchedule.getTimeStart());
+						if ((minutesUntilShow <= 120 && LocalDate.now().equals(selectedSchedule.getShowingDateTime())) || LocalDate.now().isAfter(selectedSchedule.getShowingDateTime())) {
+							System.err.println("You can't book this movie now.");
+							continue;
+						}
 						if (proceedToSeatLayout(selectedSchedule)) {
 							break; // Exit the input loop
 						}
@@ -114,7 +119,7 @@ public class MRSApp {
 
 	private boolean proceedToSeatLayout(MovieSchedule schedule) {
 		System.out.println("\nSeat Layout for " + schedule.getMovieTitle() + " @ " + schedule.getTimeStart() + "\n");
-		System.out.printf("%38s %n %n","********* Screen *********");
+		System.out.printf("%38s %n %n","******** Screen ********");
 
 		String[] letter = {"A","B","C","D","E","F","G","H"};
 
@@ -324,7 +329,7 @@ public class MRSApp {
 		}
 
 	}
-	
+
 	private void initializeMovieSchedulesFromCSV() {
 		try (BufferedReader br = new BufferedReader(new FileReader(movieScheduleFilePath))) {
 			int key = 1; // Key to identify each movie schedule
@@ -449,4 +454,3 @@ public class MRSApp {
 		}
 	}
 }
-
