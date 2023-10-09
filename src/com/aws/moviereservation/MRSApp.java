@@ -89,6 +89,9 @@ public class MRSApp {
 					String timeStart = parts[1].trim();
 					LocalTime timeStartFormatted = LocalTime.parse(timeStart, DateTimeFormatter.ofPattern("HH:mm"));
 					MovieSchedule selectedSchedule = null;
+					if(cinemaNumber < 1 || cinemaNumber > 4) {
+						throw new NumberFormatException();
+					}
 					for (MovieSchedule schedule : movieSchedules.values()) {
 						if (date.equals(schedule.getShowingDateTime()) && cinemaNumber == schedule.getCinemaNo() && timeStartFormatted.equals(schedule.getTimeStart())) {
 							selectedSchedule = schedule;
@@ -109,7 +112,7 @@ public class MRSApp {
 						}
 					}
 				} catch (NumberFormatException e) {
-					System.err.println("Invalid cinema number format. Please enter a valid cinema number.");
+					System.err.println("Invalid cinema number. Please enter a valid cinema number.");
 				}
 			} catch (DateTimeParseException err) {
 				System.err.println("Invalid time format.");
