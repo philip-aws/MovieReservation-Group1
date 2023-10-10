@@ -132,14 +132,13 @@ public class MRSApp {
 
 		String[] letter = {"A","B","C","D","E","F","G","H"};
 
-		for (int i = 0; i < 8; i++) {
-
-			if(i == 7) {
+		for (int i = 0; i < MovieSchedule.ROW; i++) {
+			if (i == 7) {
 				System.out.printf("%-8s ","Exit |");
 			} else {
 				System.out.printf("    %-4s "," |");
 			}
-			for (int j = 1; j <=5; j++) {
+			for (int j = 1; j <= MovieSchedule.COLUMN; j++) {
 				if(schedule.isSeatAvailable(letter[i] + Integer.toString(j))) {
 					System.out.printf("  %-4s","[" + letter[i] + Integer.toString(j) + "]");
 				} else {
