@@ -198,7 +198,17 @@ public class MRSApp {
 						}
 
 						while(true) {
+							System.out.println("--------------------------------------------------------");
+					        System.out.println("           MOVIE RESERVATION TICKET");
+					        System.out.println("--------------------------------------------------------");
+					        System.out.println("Reservation Number: " + RESERVATION_NUMBER);
+					        System.out.println("Theater: " + schedule.getCinemaNo());
+					        System.out.println("Showtime: " + schedule.getShowingDateTime() + " @ " + schedule.getTimeStart());
+					        System.out.println("Seats Reserved: " + seatInput);
+					        System.out.println("Number of Senior Discount: " + numberOfSenior);
+					        System.out.println("--------------------------------------------------------");
 							System.out.println("Total price for Ticket is Php " + schedule.calculatePrice(seatArray.length, numberOfSenior) + " Confirm? (Y/N) :");
+							
 							String confirmReservation = scanner.nextLine();
 							if (confirmReservation.equalsIgnoreCase("Y")) {
 								// Reserve the selected seats
@@ -270,6 +280,14 @@ public class MRSApp {
 
 				if (reservation != null && reservationNumber == reservation.getReservationNo()) {
 					while(true) {
+						System.out.println("--------------------------------------------------------");
+				        System.out.println("           MOVIE RESERVATION TICKET");
+				        System.out.println("--------------------------------------------------------");
+				        System.out.println("Reservation Number: " + reservation.getReservationNo());
+				        System.out.println("Theater: " + reservation.getCinemaNo());
+				        System.out.println("Showtime: " + reservation.getShowingDateTime() + " @ " + reservation.getTimeStart());
+				        System.out.println("Seats Reserved: " + reservation.getReservedSeats());
+				        System.out.println("--------------------------------------------------------");
 						System.out.println("Are you sure you want to cancel Ticket # \"" + reservation.getReservationNo() + "\" (Y/N) ? :");
 						String cancelReservation = scanner.nextLine();
 						if(cancelReservation.equalsIgnoreCase("Y")) {
